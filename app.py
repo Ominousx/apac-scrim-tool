@@ -134,13 +134,19 @@ SHEET_LINKS = {
     "CN": "https://docs.google.com/spreadsheets/d/1NGhZtuqgAHFzNQtdtM0KRjVihBaKKIujWh_NHCA1fA0/gviz/tq?tqx=out:csv"
 }
 
-# Region Selector
-selected_regions = st.multiselect(
-    "🌍 Select Region(s)",
-    options=["VCT Pacific", "VCL SEA", "VCL JP", "CN"],
-    default=["VCT Pacific"],
-    help="You can select multiple regions or unselect by clicking again."
+TIER_MAP = {
+    "Tier 1": ["VCT Pacific", "CN"],
+    "Tier 2": ["VCL SEA", "VCL JP"]
+}
+
+selected_tiers = st.multiselect(
+    "🌍 Select Tier(s)",
+    options=list(TIER_MAP.keys()),
+    default=["Tier 1", "Tier 2"],
+    help="Tier 1 = VCT Pacific + CN | Tier 2 = VCL SEA + JP"
 )
+
+selected_regions = [region for tier in selected_tiers for region in TIER_MAP[tier]]
 
 with st.spinner("⏳ Loading scrim data..."):
     if selected_regions:
