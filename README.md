@@ -27,9 +27,12 @@ A stylish, data-driven **Streamlit app** to help Valorant teams find the best sc
 ## 📁 Folder Structure
 
 scrimz/
-├── app.py # Streamlit app file
-├── maps/ # Stores team logos (e.g., DRX.png, Global Esports.png)
-└── README.md # You're here
+├── app.py
+└── team_logos/
+    ├── DRX.png
+    ├── Talon.png
+    ├── Global Esports.png
+    └── ...
 
 ---
 
