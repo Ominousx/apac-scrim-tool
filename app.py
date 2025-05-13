@@ -3,24 +3,25 @@ import pandas as pd
 import os
 import base64
 
-# --- Page config ---
 st.set_page_config(page_title="APAC Scrim Recommendation Tool", layout="wide")
 
-# --- CSS Styling ---
 def local_css():
     st.markdown("""
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
         <style>
+            html, body, [class*="css"]  {
+                font-family: 'Poppins', sans-serif !important;
+            }
             body {
                 background-color: #0e0e0e;
                 color: #ffffff;
-                font-family: 'Inter', sans-serif;
             }
             .block-container {
                 padding-top: 2rem;
             }
             .title {
                 font-size: 2.5rem;
-                font-weight: bold;
+                font-weight: 600;
                 color: #f5f5f5;
                 margin-bottom: 0.5rem;
             }
@@ -38,6 +39,7 @@ def local_css():
                 transition: all 0.3s ease;
             }
             .team-box:hover {
+                transform: scale(1.02);
                 border-color: #666;
                 background-color: #2c2c2e;
             }
@@ -46,6 +48,9 @@ def local_css():
                 align-items: center;
                 gap: 20px;
                 text-align: left;
+            }
+            .team-box-inline[style*='border-color: #ffc107'] {
+                box-shadow: 0 0 12px #ffc10788;
             }
             .logo-inline {
                 width: 48px;
@@ -72,27 +77,66 @@ def local_css():
                 font-size: 0.9rem;
                 color: #ccc;
             }
+            .badge {
+                background-color: #2a2a2d;
+                padding: 4px 10px;
+                border-radius: 8px;
+                font-weight: 500;
+            }
+            .fire {
+                display: inline-block;
+                animation: pulse 1.3s infinite;
+            }
+            @keyframes pulse {
+                0% { transform: scale(1); opacity: 0.9; }
+                50% { transform: scale(1.2); opacity: 1; }
+                100% { transform: scale(1); opacity: 0.9; }
+            }
+                    /* Override red pills in multiselect */
+            .stMultiSelect [data-baseweb="tag"] {
+                background-color: #3a3a3a !important;
+                color: white !important;
+            }
+            .stMultiSelect [data-baseweb="tag"]:hover {
+                background-color: #4a4a4a !important;
+            }
         </style>
     """, unsafe_allow_html=True)
 
 local_css()
 
-# --- Load data from Google Sheets ---
-sheet_url = "https://docs.google.com/spreadsheets/d/1LCzcBgnHJXjNFTAsrY0KVk1nF81r0gxPoqKBPZkvh4M/gviz/tq?tqx=out:csv"
-df = pd.read_csv(sheet_url)
+SHEET_LINKS = {
+    "VCT Pacific": "https://docs.google.com/spreadsheets/d/1LCzcBgnHJXjNFTAsrY0KVk1nF81r0gxPoqKBPZkvh4M/gviz/tq?tqx=out:csv",
+    "VCL SEA": "https://docs.google.com/spreadsheets/d/1uTaneDKNLeE9XIWfwPMRrThI-AHvlqx0b9WxDiLE_eE/gviz/tq?tqx=out:csv",
+    "VCL JP": "https://docs.google.com/spreadsheets/d/1CimAbYkpq3fH2-Bfz6DsNR537Dr0BIumQ8ehAv7Ga-w/gviz/tq?tqx=out:csv",
+    "CN": "https://docs.google.com/spreadsheets/d/1NGhZtuqgAHFzNQtdtM0KRjVihBaKKIujWh_NHCA1fA0/gviz/tq?tqx=out:csv"
+}
 
-# --- Title ---
-st.markdown("<div class='title'>🌏 APAC Scrim Recommendation Tool</div>", unsafe_allow_html=True)
-st.markdown("<div class='subtitle'>Select a map to find the best-performing teams with their comps.</div>", unsafe_allow_html=True)
+# Region Selector
+selected_regions = st.multiselect(
+    "🌍 Select Region(s)",
+    options=["VCT Pacific", "VCL SEA", "VCL JP", "CN"],
+    default=["VCT Pacific"],
+    help="You can select multiple regions or unselect by clicking again."
+)
 
-# --- Select Map ---
+with st.spinner("⏳ Loading scrim data..."):
+    if selected_regions:
+        dfs = []
+        for reg in selected_regions:
+            if reg in SHEET_LINKS:
+                dfs.append(pd.read_csv(SHEET_LINKS[reg]))
+        df = pd.concat(dfs, ignore_index=True) if len(dfs) > 1 else dfs[0]
+    else:
+        st.warning("Please select at least one region to view data.")
+        st.stop()
+
+# Map selector
 maps = sorted(df["Map Name"].unique())
 selected_map = st.selectbox("🗺️ Choose a Map", maps)
-
-# --- Filter Map Data ---
 map_df = df[df["Map Name"] == selected_map]
 
-# --- Process Team Performance ---
+# Stats + Streaks
 def get_summary(map_df):
     data = []
     for _, row in map_df.iterrows():
@@ -103,13 +147,17 @@ def get_summary(map_df):
             agents = row[f"Team {side} Agents"]
             win = int(score > opp_score)
             data.append({
+                "Match Id": row["Match Id"],
                 "Team": team,
                 "Win": win,
                 "Comp": agents
             })
-
-    df_summary = pd.DataFrame(data)
-    grouped = (
+    df_summary = pd.DataFrame(data).sort_values(["Team", "Match Id"])
+    df_summary["Streak"] = df_summary.groupby("Team")["Win"].transform(
+        lambda x: (x != x.shift()).cumsum().groupby(x).cumcount() + 1
+    ) * df_summary["Win"]
+    latest = df_summary.groupby("Team").tail(1)[["Team", "Streak"]]
+    result = (
         df_summary.groupby("Team")
         .agg(
             Matches=("Win", "count"),
@@ -118,31 +166,72 @@ def get_summary(map_df):
             CommonComp=("Comp", lambda x: x.mode().iloc[0] if not x.mode().empty else "N/A")
         )
         .reset_index()
+        .merge(latest, on="Team", how="left")
         .sort_values("WinRate", ascending=False)
     )
-    return grouped
+    return result
 
-# --- Display Team Results (inline logos, skip 1-match teams) ---
+# Final filtering
 summary = get_summary(map_df)
-summary = summary[(summary["Matches"] > 1) & (summary["WinRate"] >= 50)]  # Hide teams with only 1 match
+summary = summary[(summary["Matches"] >= 3) & (summary["WinRate"] >= 50)]
+top3 = summary.head(3)
+others = summary.iloc[3:]
 
-for _, row in summary.iterrows():
+# Render block
+def render_team_row(row, highlight=False):
     team = row['Team'].strip()
     logo_path = f"maps/{team}.png"
-
+    fire = '<span class="fire">🔥</span>' if row.get("Streak", 0) >= 3 else ""
     if os.path.exists(logo_path):
         encoded = base64.b64encode(open(logo_path, "rb").read()).decode()
-        logo_html = f'<img src="data:image/png;base64,{encoded}" class="logo-inline" alt="{team} logo" />'
+        logo_html = f'{fire}<img src="data:image/png;base64,{encoded}" class="logo-inline" alt="{team} logo" />'
     else:
         logo_html = ""
 
+    border_style = "border-color: #ffc107;" if highlight else ""
+
     st.markdown(f"""
-        <div class="team-box team-box-inline">
+        <div class="team-box team-box-inline" style="{border_style}">
             {logo_html}
             <div class="team-info">
-                <div class="team-name">{team}</div>
+                <div class="team-name"><span class="badge">{team}</span></div>
                 <div class="comp">🧬 {row['CommonComp']}</div>
                 <div class="stat">📊 Win Rate: {row['WinRate']}% | 🧩 {int(row['Wins'])} / {int(row['Matches'])} Wins</div>
             </div>
         </div>
     """, unsafe_allow_html=True)
+
+# Top 3
+st.markdown("<div class='team-name' style='font-size:1.5rem;margin-top:30px;'>🏆 Top Picks</div>", unsafe_allow_html=True)
+for _, row in top3.iterrows():
+    render_team_row(row, highlight=True)
+
+# Others
+if not others.empty:
+    st.markdown("<div class='team-name' style='font-size:1.2rem;margin-top:20px;'>🧪 Other Picks</div>", unsafe_allow_html=True)
+    for _, row in others.iterrows():
+        render_team_row(row)
+
+# --- Footer with X, GitHub, Medium icons ---
+def encode_img(path, height=18):
+    if os.path.exists(path):
+        with open(path, "rb") as f:
+            encoded = base64.b64encode(f.read()).decode()
+            return f'<img src="data:image/png;base64,{encoded}" style="height:{height}px; vertical-align:middle; margin-right:6px;" />'
+    return ""
+
+x_logo = encode_img("maps/xcom.png")
+gh_logo = encode_img("maps/gitHub.png")
+md_logo = encode_img("maps/medium.png")
+
+st.markdown(f"""
+<hr style="margin-top: 50px; margin-bottom: 10px; border: 0.5px solid #333;" />
+<div style="text-align: center; font-size: 0.9rem; color: #888;">
+    📊 Data from past 60 days<br>
+    {x_logo}<a href="https://twitter.com/_SushantJha" target="_blank" style="color:#8affc1;text-decoration:none;">@Ominous</a>
+    &nbsp;&nbsp;&nbsp;
+    {gh_logo}<a href="https://github.com/Ominousx/apac-scrim-tool" target="_blank" style="color:#8affc1;text-decoration:none;">GitHub</a>
+    &nbsp;&nbsp;&nbsp;
+    {md_logo}<a href="https://medium.com/@_SushantJha" target="_blank" style="color:#8affc1;text-decoration:none;">Medium</a>
+</div>
+""", unsafe_allow_html=True)
