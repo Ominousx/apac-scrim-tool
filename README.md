@@ -24,27 +24,7 @@ A stylish, data-driven **Streamlit app** to help Valorant teams find the best sc
 
 ---
 
-## 📁 Folder Structure
+##  Credits
 
-scrimz/
-├── app.py
-└── team_logos/
-    ├── DRX.png
-    ├── Talon.png
-    ├── Global Esports.png
-    └── ...
-
----
-
-## 🚀 How to Run Locally
-
-```bash
-git clone https://github.com/Ominousx/apac-scrim-tool.git
-cd apac-scrim-tool
-pip install -r requirements.txt
-streamlit run app.py
-
-✍️ Credits
-
-Built by @_SushantJha 🎮
+Built by @_SushantJha 
 For feedback or feature requests, open an issue or connect on Twitter/X
