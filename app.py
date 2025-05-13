@@ -92,7 +92,7 @@ def local_css():
                 50% { transform: scale(1.2); opacity: 1; }
                 100% { transform: scale(1); opacity: 0.9; }
             }
-                    /* Override red pills in multiselect */
+            /* Override red pills in multiselect */
             .stMultiSelect [data-baseweb="tag"] {
                 background-color: #3a3a3a !important;
                 color: white !important;
@@ -100,10 +100,32 @@ def local_css():
             .stMultiSelect [data-baseweb="tag"]:hover {
                 background-color: #4a4a4a !important;
             }
+
+            /* ===== Scroll fix and layout patch ===== */
+            html, body {
+                height: 100% !important;
+                overflow-y: auto !important;
+                scroll-behavior: smooth;
+            }
+            .main, .block-container {
+                min-height: 100vh !important;
+                overflow-y: auto !important;
+                padding-top: 2rem;
+            }
+            body::before {
+                content: '';
+                display: block;
+                height: 1px;
+                margin-top: -1px;
+            }
         </style>
     """, unsafe_allow_html=True)
 
 local_css()
+
+st.markdown("<div class='title'>🌍 APAC Scrim Recommendation Tool</div>", unsafe_allow_html=True)
+st.markdown("<div class='subtitle'>Get team scrim suggestions by map and region based on recent match data</div>", unsafe_allow_html=True)
+
 
 SHEET_LINKS = {
     "VCT Pacific": "https://docs.google.com/spreadsheets/d/1LCzcBgnHJXjNFTAsrY0KVk1nF81r0gxPoqKBPZkvh4M/gviz/tq?tqx=out:csv",
