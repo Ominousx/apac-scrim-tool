@@ -2,7 +2,7 @@
 
 A sleek Streamlit web app that helps analysts and teams discover the **best-performing scrim opponents by map and region** in the Asia-Pacific Valorant scene — powered by real VLR.gg data.
 
-![Screenshot](screenshot.png)
+![Screenshot](maps/screenshot.png)
 
 ---
 
