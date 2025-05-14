@@ -5,18 +5,23 @@ import base64
 
 st.set_page_config(page_title="APAC Scrim Recommendation Tool", layout="wide")
 
+# --- Local CSS Styling ---
 def local_css():
     st.markdown("""
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
         <style>
-            html, body, [class*="css"]  {
+             html, body, [class*="css"] {
                 font-family: 'Poppins', sans-serif !important;
+                background-color: #121212 !important;
+                color: #e0e0e0 !important;
             }
-            body {
-                background-color: #0e0e0e;
-                color: #ffffff;
+
+            .main {
+                background-color: #121212 !important;
             }
+
             .block-container {
+                background-color: #121212 !important;
                 padding-top: 2rem;
             }
             .title {
@@ -24,15 +29,17 @@ def local_css():
                 font-weight: 600;
                 color: #f5f5f5;
                 margin-bottom: 0.5rem;
+                text-align: center;
             }
             .subtitle {
-                color: #888;
+                color: #cccccc;
                 font-size: 1.1rem;
                 margin-bottom: 2rem;
+                text-align: center;
             }
             .team-box {
-                background-color: #1c1c1e;
-                border: 1px solid #333;
+                background-color: #121212;
+                border: 1px solid #444;
                 border-radius: 12px;
                 padding: 20px;
                 margin-bottom: 20px;
@@ -41,7 +48,7 @@ def local_css():
             .team-box:hover {
                 transform: scale(1.02);
                 border-color: #666;
-                background-color: #2c2c2e;
+                background-color: #333;
             }
             .team-box-inline {
                 display: flex;
@@ -78,7 +85,7 @@ def local_css():
                 color: #ccc;
             }
             .badge {
-                background-color: #2a2a2d;
+                background-color: #3a3a3a;
                 padding: 4px 10px;
                 border-radius: 8px;
                 font-weight: 500;
@@ -92,7 +99,6 @@ def local_css():
                 50% { transform: scale(1.2); opacity: 1; }
                 100% { transform: scale(1); opacity: 0.9; }
             }
-            /* Override red pills in multiselect */
             .stMultiSelect [data-baseweb="tag"] {
                 background-color: #3a3a3a !important;
                 color: white !important;
@@ -100,8 +106,6 @@ def local_css():
             .stMultiSelect [data-baseweb="tag"]:hover {
                 background-color: #4a4a4a !important;
             }
-
-            /* ===== Scroll fix and layout patch ===== */
             html, body {
                 height: 100% !important;
                 overflow-y: auto !important;
@@ -123,9 +127,8 @@ def local_css():
 
 local_css()
 
-st.markdown("<div class='title'>🌍 APAC Scrim Recommendation Tool</div>", unsafe_allow_html=True)
+st.markdown("<div class='title'>Asia Scrim Recommendation Tool</div>", unsafe_allow_html=True)
 st.markdown("<div class='subtitle'>Get team scrim suggestions by map and region based on recent match data</div>", unsafe_allow_html=True)
-
 
 SHEET_LINKS = {
     "VCT Pacific": "https://docs.google.com/spreadsheets/d/1LCzcBgnHJXjNFTAsrY0KVk1nF81r0gxPoqKBPZkvh4M/gviz/tq?tqx=out:csv",
@@ -140,29 +143,29 @@ TIER_MAP = {
     "Tier 2": ["VCL SEA", "VCL JP", "VCL KR"]
 }
 
-selected_tiers = st.multiselect(
-    "🌍 Select Tier(s)",
-    options=list(TIER_MAP.keys()),
-    default=["Tier 1", "Tier 2"],
-    help="Tier 1 = VCT Pacific + CN | Tier 2 = VCL SEA + JP + KR"
-)
+# --- UI Filters ---
+col1, col2 = st.columns([2, 1])
 
-selected_regions = [region for tier in selected_tiers for region in TIER_MAP[tier]]
+with col1:
+    selected_tiers = st.multiselect(
+        "🌍 Select Tiers",
+        options=list(TIER_MAP.keys()),
+        default=list(TIER_MAP.keys()),
+        help="Tier 1 = VCT Pacific + CN | Tier 2 = VCL SEA + JP + KR"
+    )
+    selected_regions = [region for tier in selected_tiers for region in TIER_MAP[tier]]
 
-with st.spinner("⏳ Loading scrim data..."):
-    if selected_regions:
-        dfs = []
-        for reg in selected_regions:
-            if reg in SHEET_LINKS:
-                dfs.append(pd.read_csv(SHEET_LINKS[reg]))
-        df = pd.concat(dfs, ignore_index=True) if len(dfs) > 1 else dfs[0]
-    else:
-        st.warning("Please select at least one region to view data.")
-        st.stop()
+if selected_regions:
+    dfs = [pd.read_csv(SHEET_LINKS[reg]) for reg in selected_regions if reg in SHEET_LINKS]
+    df = pd.concat(dfs, ignore_index=True) if len(dfs) > 1 else dfs[0]
 
-# Map selector
-maps = sorted(df["Map Name"].unique())
-selected_map = st.selectbox("🗺️ Choose a Map", maps)
+    with col2:
+        maps = sorted(df["Map Name"].dropna().unique())
+        selected_map = st.selectbox("🗺️ Choose a Map", maps)
+else:
+    st.warning("Please select at least one region to view data.")
+    st.stop()
+
 map_df = df[df["Map Name"] == selected_map]
 
 # Stats + Streaks
