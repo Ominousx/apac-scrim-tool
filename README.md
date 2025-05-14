@@ -88,13 +88,4 @@ For feedback, feature requests, or contributions, feel free to:
 - Fork the repo
 - Or connect on Twitter
 
-📊 Data from [vlr.gg](https://vlr.gg) | 🛠️ Interface by a Valorant Analyst for Valorant Analysts
-
----
-
-## 📌 Coming Soon
-
-- ✅ Patch notes + auto-refresh sync  
-- ✅ Full region flag support  
-- ✅ Hover-based comp previews  
-- ✅ Export to PDF/CSV for coaches
+📊 Data from [vlr.gg](https://vlr.gg)
