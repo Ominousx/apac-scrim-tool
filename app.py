@@ -131,19 +131,20 @@ SHEET_LINKS = {
     "VCT Pacific": "https://docs.google.com/spreadsheets/d/1LCzcBgnHJXjNFTAsrY0KVk1nF81r0gxPoqKBPZkvh4M/gviz/tq?tqx=out:csv",
     "VCL SEA": "https://docs.google.com/spreadsheets/d/1uTaneDKNLeE9XIWfwPMRrThI-AHvlqx0b9WxDiLE_eE/gviz/tq?tqx=out:csv",
     "VCL JP": "https://docs.google.com/spreadsheets/d/1CimAbYkpq3fH2-Bfz6DsNR537Dr0BIumQ8ehAv7Ga-w/gviz/tq?tqx=out:csv",
+    "VCL KR": "https://docs.google.com/spreadsheets/d/1WpRhAug3qon-YE4llo_gQ8pzjwixQ3l9lC6uxjzvUoY/gviz/tq?tqx=out:csv",
     "CN": "https://docs.google.com/spreadsheets/d/1NGhZtuqgAHFzNQtdtM0KRjVihBaKKIujWh_NHCA1fA0/gviz/tq?tqx=out:csv"
 }
 
 TIER_MAP = {
     "Tier 1": ["VCT Pacific", "CN"],
-    "Tier 2": ["VCL SEA", "VCL JP"]
+    "Tier 2": ["VCL SEA", "VCL JP", "VCL KR"]
 }
 
 selected_tiers = st.multiselect(
     "🌍 Select Tier(s)",
     options=list(TIER_MAP.keys()),
     default=["Tier 1", "Tier 2"],
-    help="Tier 1 = VCT Pacific + CN | Tier 2 = VCL SEA + JP"
+    help="Tier 1 = VCT Pacific + CN | Tier 2 = VCL SEA + JP + KR"
 )
 
 selected_regions = [region for tier in selected_tiers for region in TIER_MAP[tier]]
