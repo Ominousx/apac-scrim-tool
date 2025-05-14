@@ -1,30 +1,100 @@
 # 🌏 APAC Scrim Recommendation Tool
 
-A stylish, data-driven **Streamlit app** to help Valorant teams find the best scrim opponents in the APAC region based on map performance and team composition history.
+A sleek Streamlit web app that helps analysts and teams discover the **best-performing scrim opponents by map and region** in the Asia-Pacific Valorant scene — powered by real VLR.gg data.
+
+![Screenshot](screenshot.png)
 
 ---
 
-## 🧠 What It Does
+## 📊 What It Does
 
-- 🗺️ Select a map you want to practice (e.g., *Ascent*, *Icebox*)
-- 📊 View top-performing APAC teams on that map
-- 🧩 See each team’s **win rate**, **match count**, and **most-used composition**
-- 🖼️ Displays team logos inline
-- 🧼 Automatically filters out teams with:
-  - Fewer than 2 matches played
-  - Less than 50% win rate
-
----
-
-## 🛠️ Tech Stack
-
-- **Streamlit**
-- **Pandas**
-- **Custom CSS** for dark Guardian-style UI
+This tool lets you:
+- 🔢 **Filter by Tier 1 / Tier 2 leagues**
+- 🗺️ **Choose a specific Valorant map**
+- 🔍 See the **top 3 teams** based on win rate, with:
+  - Streak indicators 🔥
+  - Most common comps 🧬
+  - W/L stats 📈
+- 💡 Filter logic is based on recent match data from [vlr.gg](https://vlr.gg)
 
 ---
 
-##  Credits
+## ✨ Features
 
-Built by @_SushantJha 
-For feedback or feature requests, open an issue or connect on Twitter/X
+- ⚡ **Live Data Fetching** from Google Sheets (linked to VLR-scraped stats)
+- 🌗 **Dark grey UI** with a minimal, modern layout
+- 🔥 **Streak highlighting** for in-form teams
+- 🎨 **Team logos and composition badges**
+- 📅 **Last updated date** clearly displayed
+
+---
+
+## 🚀 Run Locally
+
+Clone this repo:
+
+```bash
+git clone https://github.com/Ominousx/apac-scrim-tool.git
+cd apac-scrim-tool
+```
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Run the app:
+
+```bash
+streamlit run app.py
+```
+
+---
+
+## 🧰 Tech Stack
+
+- **Frontend**: [Streamlit](https://streamlit.io)
+- **Styling**: Custom CSS (Poppins font, responsive layout)
+- **Data Source**: Google Sheets linked from [vlr.gg](https://vlr.gg)
+- **Hosting**: Can be deployed via Streamlit Cloud / Hugging Face Spaces / GitHub Pages (static screenshot + repo)
+
+---
+
+## 📂 File Structure
+
+```bash
+📁 apac-scrim-tool
+├── app.py
+├── .streamlit/
+│   └── config.toml
+├── maps/
+│   ├── ascent.png
+│   ├── murash_logo.png
+│   └── ...
+├── screenshot.png
+├── requirements.txt
+└── README.md
+```
+
+---
+
+## ✍️ Credits
+
+Built by [@Ominous](https://twitter.com/_SushantJha) 🎮
+
+For feedback, feature requests, or contributions, feel free to:
+- Open an issue
+- Fork the repo
+- Or connect on Twitter
+
+📊 Data from [vlr.gg](https://vlr.gg) | 🛠️ Interface by a Valorant Analyst for Valorant Analysts
+
+---
+
+## 📌 Coming Soon
+
+- ✅ Patch notes + auto-refresh sync  
+- ✅ Full region flag support  
+- ✅ Hover-based comp previews  
+- ✅ Export to PDF/CSV for coaches

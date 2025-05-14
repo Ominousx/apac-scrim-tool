@@ -127,8 +127,21 @@ def local_css():
 
 local_css()
 
-st.markdown("<div class='title'>Asia Scrim Recommendation Tool</div>", unsafe_allow_html=True)
+st.markdown("<div class='title'>🌏 Asia Scrim Recommendation Tool</div>", unsafe_allow_html=True)
 st.markdown("<div class='subtitle'>Get team scrim suggestions by map and region based on recent match data</div>", unsafe_allow_html=True)
+
+from datetime import datetime
+
+# Get today's date
+last_updated = datetime.today().strftime("%B %d, %Y")
+
+st.markdown(f"""
+<div style='text-align: center; font-size: 0.9rem; color: #888; margin-bottom: 1.5rem;'>
+    <span>📊 Data from: <a href="https://vlr.gg" target="_blank" style="color: #8affc1; text-decoration: none;">vlr.gg</a></span>
+    &nbsp;|&nbsp;
+    <span>🕒 Last updated: <span style="color: #ccc;">{last_updated}</span></span>
+</div>
+""", unsafe_allow_html=True)
 
 SHEET_LINKS = {
     "VCT Pacific": "https://docs.google.com/spreadsheets/d/1LCzcBgnHJXjNFTAsrY0KVk1nF81r0gxPoqKBPZkvh4M/gviz/tq?tqx=out:csv",
@@ -148,7 +161,7 @@ col1, col2 = st.columns([2, 1])
 
 with col1:
     selected_tiers = st.multiselect(
-        "🌍 Select Tiers",
+        "🔢 Select Tiers",
         options=list(TIER_MAP.keys()),
         default=list(TIER_MAP.keys()),
         help="Tier 1 = VCT Pacific + CN | Tier 2 = VCL SEA + JP + KR"
