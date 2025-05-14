@@ -1,6 +1,6 @@
 # 🌏 APAC Scrim Recommendation Tool
 
-A sleek Streamlit web app that helps analysts and teams discover the **best-performing scrim opponents by map and region** in the Asia-Pacific Valorant scene — powered by real VLR.gg data.
+A sleek Streamlit web app that helps analysts and teams discover the **best-performing scrim opponents by map and sub-region** in the Asian Valorant scene — powered by real VLR.gg data.
 
 ![Screenshot](maps/screenshot.png)
 
@@ -21,8 +21,7 @@ This tool lets you:
 
 ## ✨ Features
 
-- ⚡ **Live Data Fetching** from Google Sheets (linked to VLR-scraped stats)
-- 🌗 **Dark grey UI** with a minimal, modern layout
+- ⚡ **Weekly Data Fetching** from [vlr.gg](https://vlr.gg)
 - 🔥 **Streak highlighting** for in-form teams
 - 🎨 **Team logos and composition badges**
 - 📅 **Last updated date** clearly displayed
@@ -55,9 +54,8 @@ streamlit run app.py
 ## 🧰 Tech Stack
 
 - **Frontend**: [Streamlit](https://streamlit.io)
-- **Styling**: Custom CSS (Poppins font, responsive layout)
-- **Data Source**: Google Sheets linked from [vlr.gg](https://vlr.gg)
-- **Hosting**: Can be deployed via Streamlit Cloud / Hugging Face Spaces / GitHub Pages (static screenshot + repo)
+- **Styling**: Custom CSS
+- **Hosting**: Deployed via Streamlit Cloud
 
 ---
 
@@ -88,4 +86,4 @@ For feedback, feature requests, or contributions, feel free to:
 - Fork the repo
 - Or connect on Twitter
 
-📊 Data from [vlr.gg](https://vlr.gg)
+Data from [vlr.gg](https://vlr.gg)
