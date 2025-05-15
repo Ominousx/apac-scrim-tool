@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import os
 import base64
+from summary_utils import get_summary
 
 st.set_page_config(page_title="APAC Scrim Recommendation Tool", layout="wide")
 
@@ -181,44 +182,11 @@ else:
 
 map_df = df[df["Map Name"] == selected_map]
 
-# Stats + Streaks
-def get_summary(map_df):
-    data = []
-    for _, row in map_df.iterrows():
-        for side in [1, 2]:
-            team = row[f"Team {side} Name"]
-            score = row[f"Team {side} Score"]
-            opp_score = row[f"Team {3 - side} Score"]
-            agents = row[f"Team {side} Agents"]
-            win = int(score > opp_score)
-            data.append({
-                "Match Id": row["Match Id"],
-                "Team": team,
-                "Win": win,
-                "Comp": agents
-            })
-    df_summary = pd.DataFrame(data).sort_values(["Team", "Match Id"])
-    df_summary["Streak"] = df_summary.groupby("Team")["Win"].transform(
-        lambda x: (x != x.shift()).cumsum().groupby(x).cumcount() + 1
-    ) * df_summary["Win"]
-    latest = df_summary.groupby("Team").tail(1)[["Team", "Streak"]]
-    result = (
-        df_summary.groupby("Team")
-        .agg(
-            Matches=("Win", "count"),
-            Wins=("Win", "sum"),
-            WinRate=("Win", lambda x: round(100 * x.mean(), 1)),
-            CommonComp=("Comp", lambda x: x.mode().iloc[0] if not x.mode().empty else "N/A")
-        )
-        .reset_index()
-        .merge(latest, on="Team", how="left")
-        .sort_values("WinRate", ascending=False)
-    )
-    return result
-
 # Final filtering
-summary = get_summary(map_df)
-summary = summary[(summary["Matches"] >= 3) & (summary["WinRate"] >= 50)]
+all_region_dfs = [(reg, df[df["Map Name"] == selected_map]) for reg, df in zip(selected_regions, dfs)]
+summary = get_summary(all_region_dfs)
+#st.dataframe(summary[["Team", "WinRate", "Matches", "Streak", "Tier", "ScrimScore"]]) (test to see scores)
+summary = summary.loc[(summary["Matches"] >= 3) & (summary["WinRate"] >= 50)]
 top3 = summary.head(3)
 others = summary.iloc[3:]
 
