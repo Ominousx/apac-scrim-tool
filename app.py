@@ -141,6 +141,8 @@ st.markdown(f"""
     <span>📊 Data from: <a href="https://vlr.gg" target="_blank" style="color: #8affc1; text-decoration: none;">vlr.gg</a></span>
     &nbsp;|&nbsp;
     <span>🕒 Last updated: <span style="color: #ccc;">{last_updated}</span></span>
+    &nbsp;|&nbsp;
+     <span>📦 Version: <span style="color: #ccc;">2.1</span></span>
 </div>
 """, unsafe_allow_html=True)
 
@@ -185,7 +187,7 @@ map_df = df[df["Map Name"] == selected_map]
 # Final filtering
 all_region_dfs = [(reg, df[df["Map Name"] == selected_map]) for reg, df in zip(selected_regions, dfs)]
 summary = get_summary(all_region_dfs)
-#st.dataframe(summary[["Team", "WinRate", "Matches", "Streak", "Tier", "ScrimScore"]]) (test to see scores)
+#st.dataframe(summary[["Team", "WinRate", "Matches", "Streak", "Tier", "ScrimScore"]])
 summary = summary.loc[(summary["Matches"] >= 3) & (summary["WinRate"] >= 50)]
 top3 = summary.head(3)
 others = summary.iloc[3:]
